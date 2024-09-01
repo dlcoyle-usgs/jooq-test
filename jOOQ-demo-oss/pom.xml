@@ -22,7 +22,7 @@
         <!-- We're using the JDK 17 version which you can download from https://www.jooq.org/download/versions -->
         <jooq.version>3.19.11</jooq.version>
         <flyway.version>8.5.11</flyway.version>
-        <postgres.version>42.7.2</postgres.version>
+        <postgres.version>42.7.3</postgres.version>
         <log4j.version>2.17.1</log4j.version>
         <junit.version>4.13.2</junit.version>
         <kotlin.version>1.6.21</kotlin.version>
@@ -37,9 +37,7 @@
     <modules>
         <module>jOOQ-demo-utils</module>
         <module>jOOQ-demo-java</module>
-        <module>jOOQ-demo-kotlin</module>
-        <module>jOOQ-demo-scala</module>
-    </modules>
+        </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -63,21 +61,9 @@
                 <version>${postgres.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>r2dbc-postgresql</artifactId>
-                <version>1.0.0.RELEASE</version>
-            </dependency>
-            <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-core</artifactId>
                 <version>${flyway.version}</version>
-            </dependency>
-
-            <!-- Reactive streams. Use your own implementation if you prefer another one -->
-            <dependency>
-                <groupId>io.projectreactor</groupId>
-                <artifactId>reactor-core</artifactId>
-                <version>3.4.18</version>
             </dependency>
 
             <!-- Logging -->
@@ -107,52 +93,6 @@
                 <artifactId>postgresql</artifactId>
                 <version>${testcontainers.version}</version>
             </dependency>
-
-            <!-- Kotlin -->
-            <dependency>
-                <groupId>org.jooq</groupId>
-                <artifactId>jooq-kotlin</artifactId>
-                <version>${jooq.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jooq</groupId>
-                <artifactId>jooq-kotlin-coroutines</artifactId>
-                <version>${jooq.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-stdlib-jdk8</artifactId>
-                <version>${kotlin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-test</artifactId>
-                <version>${kotlin.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-stdlib-jdk8</artifactId>
-                <version>${kotlin.version}</version>
-            </dependency>
-
-            <!-- Scala -->
-            <dependency>
-                <groupId>org.jooq</groupId>
-                <artifactId>jooq-scala_2.13</artifactId>
-                <version>${jooq.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.scala-lang</groupId>
-                <artifactId>scala-library</artifactId>
-                <version>${scala.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.scala-lang</groupId>
-                <artifactId>scala-compiler</artifactId>
-                <version>${scala.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -168,65 +108,6 @@
                         <source>17</source>
                         <target>17</target>
                     </configuration>
-                </plugin>
-
-                <!-- Much better if there was a testcontainers lifecycle management plugin!
-                     Upvote here if you like the idea: https://github.com/testcontainers/testcontainers-java/issues/4397 -->
-                <plugin>
-                    <groupId>org.codehaus.gmaven</groupId>
-                    <artifactId>groovy-maven-plugin</artifactId>
-                    <version>2.1.1</version>
-                    <executions>
-                        <execution>
-
-                            <!-- Start testcontainers before code generation -->
-                            <id>testcontainers-start</id>
-                            <phase>generate-sources</phase>
-                            <goals>
-                                <goal>execute</goal>
-                            </goals>
-                            <configuration>
-                                <source>
-                                    db = new org.testcontainers.containers.PostgreSQLContainer("postgres:latest")
-                                            .withUsername("${db.username}")
-                                            .withDatabaseName("postgres")
-                                            .withPassword("${db.password}")
-
-                                    db.start()
-                                    project.properties.setProperty('db.url', db.getJdbcUrl())
-                                    project.properties.setProperty('testcontainers.containerId', db.getContainerId());
-                                    project.properties.setProperty('testcontainers.imageName', db.getDockerImageName());
-                                </source>
-                            </configuration>
-                        </execution>
-                        <execution>
-
-                            <!-- Stop testcontainers after tests have completed -->
-                            <id>testcontainers-stop</id>
-                            <phase>post-integration-test</phase>
-                            <goals>
-                                <goal>execute</goal>
-                            </goals>
-                            <configuration>
-                                <source>
-                                    containerId = "${testcontainers.containerId}"
-                                    imageName = "${testcontainers.imageName}"
-                                    println("Stopping testcontainer $containerId - $imageName")
-                                    org.testcontainers.utility.ResourceReaper
-                                            .instance()
-                                            .stopAndRemoveContainer(containerId, imageName);
-                                </source>
-                            </configuration>
-                        </execution>
-                    </executions>
-
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.testcontainers</groupId>
-                            <artifactId>postgresql</artifactId>
-                            <version>${testcontainers.version}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
 
                 <plugin>
