@@ -1,4 +1,4 @@
-# jOOQ demo forked from main project for personal use (non-contributing). 
+# jOOQ demo forked from main project for personal use 
 
 This is a jOOQ demo forked from main project for personal use and learning. 
 
